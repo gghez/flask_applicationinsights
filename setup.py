@@ -9,27 +9,25 @@ from setuptools import setup
 
 setup(
     name='Flask-ApplicationInsights',
-    version='1.0',
-    url='http://example.com/flask-sqlite3/',
-    license='BSD',
-    author='Gregory ghez',
+    version='0.1.0',
+    url='https://github.com/gghez/flask_applicationinsights',
+    license='MIT',
+    author='Gregory Ghez',
     author_email='gregory.ghez@gmail.com',
     description='Microsoft Azure Application Insights integration for Flask.',
     long_description=__doc__,
     py_modules=['flask_applicationinsights'],
-    # if you would be using a package instead use packages instead
-    # of py_modules:
-    # packages=['flask_sqlite3'],
     zip_safe=False,
     include_package_data=True,
     platforms='any',
     install_requires=[
-        'Flask'
+        'Flask>=1.0.2',
+        'applicationinsights==0.11.6'
     ],
     classifiers=[
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD License',
+        'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
