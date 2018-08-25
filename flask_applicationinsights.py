@@ -10,7 +10,9 @@ from applicationinsights import TelemetryClient
 from applicationinsights.channel import TelemetryChannel, AsynchronousQueue, AsynchronousSender
 from flask import _app_ctx_stack, current_app, Response, g, request, Request, Flask
 
-CONFIG_INSTRUMENTATION_KEY = 'APPINSIGHTS_INSTRUMENTATION_KEY'
+CONFIG_KEY_INSTRUMENTATION_KEY = 'APPINSIGHTS_INSTRUMENTATION_KEY'
+CONFIG_KEY_DEFAULT_REQUEST_NAME = 'APPINSIGHTS_DEFAULT_REQUEST_NAME'
+CONFIG_DEFAULT_REQUEST_NAME = 'Flask'
 
 
 def _extract_properties(req: Request, resp: Response):
@@ -47,10 +49,15 @@ class ApplicationInsights(object):
         self._properties_fillers = []
         self._measurements_fillers = []
         self._request_name = None
+        self._instrumentation_key = instrumentation_key
 
     def init_app(self, app: Flask, instrumentation_key=None):
-        instrumentation_key = instrumentation_key or os.environ.get(CONFIG_INSTRUMENTATION_KEY)
-        app.config.setdefault(CONFIG_INSTRUMENTATION_KEY, instrumentation_key)
+        instrumentation_key = instrumentation_key or self._instrumentation_key or os.environ.get(
+            CONFIG_KEY_INSTRUMENTATION_KEY)
+        if instrumentation_key:
+            app.config[CONFIG_KEY_INSTRUMENTATION_KEY] = instrumentation_key
+        app.config.setdefault(CONFIG_KEY_DEFAULT_REQUEST_NAME, CONFIG_DEFAULT_REQUEST_NAME)
+
         app.teardown_appcontext(self.teardown)
 
         @app.errorhandler(Exception)
@@ -60,7 +67,8 @@ class ApplicationInsights(object):
                 value=e,
                 tb=e.__traceback__
             )
-            raise e
+
+            return 'Internal server error', 500
 
         @app.before_request
         def _before():
@@ -76,7 +84,8 @@ class ApplicationInsights(object):
             for f in self._measurements_fillers:
                 measurements.update(f(request, resp))
 
-            req_name = self._request_name(request) if self._request_name else 'Flask'
+            req_name = self._request_name(request) if self._request_name else app.config[
+                CONFIG_KEY_DEFAULT_REQUEST_NAME]
             self.client.track_request(
                 req_name,
                 request.path,
@@ -133,7 +142,7 @@ class ApplicationInsights(object):
         if ctx is not None:
             if not hasattr(ctx, 'appinsight_client'):
                 ctx.appinsight_client = TelemetryClient(
-                    current_app.config[CONFIG_INSTRUMENTATION_KEY],
+                    current_app.config[CONFIG_KEY_INSTRUMENTATION_KEY],
                     telemetry_channel=TelemetryChannel(queue=AsynchronousQueue(AsynchronousSender()))
                 )
             return ctx.appinsight_client
