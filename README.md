@@ -2,19 +2,14 @@
 
 Flask extension for Microsoft Azure Application Insights.
 
+## Dependencies
+
+- flask>=1.0.2
+- applicationinsights==0.11.6
+
 ## Usage
 
 Retrieve package from pypi:
-
-
-Dependencies
-
-```
-pip install flask
-pip install applicationinsights
-```
-
-Extension install
 
 ```
 pip install flask_applicationinsights
@@ -39,6 +34,8 @@ def index():
 
 app.run()
 ```
+
+You can also provide instrumentation key as environment variable or flask configuration key. Key name is `APPINSIGHTS_INSTRUMENTATION_KEY`
 
 ## Contribution
 
