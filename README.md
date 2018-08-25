@@ -15,6 +15,9 @@ Retrieve package from pypi:
 pip install flask_applicationinsights
 ```
 
+Instrumentation key can be provided programmatically as well as by environment variable or flask configuration key.
+Key name is `APPINSIGHTS_INSTRUMENTATION_KEY`.
+
 ### Basic
 
 Will track all requests (succeeded or failed) to your application insight referenced by its instrumentation key.
@@ -35,7 +38,23 @@ def index():
 app.run()
 ```
 
-You can also provide instrumentation key as environment variable or flask configuration key. Key name is `APPINSIGHTS_INSTRUMENTATION_KEY`
+### Advanced
+
+You can also add custom properties or measurements to each tracked request by using special decorators.
+
+```python
+...
+
+insight = ApplicationInsights(...)
+...
+
+@insight.properties
+def custom_properties(req: Request, resp: Response):
+    return {
+        'req_pragma': req.headers.get('Pragma'),
+        'resp_charset': resp.charset
+    }
+```
 
 ## Contribution
 
