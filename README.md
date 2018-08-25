@@ -2,10 +2,14 @@
 
 Flask extension for Microsoft Azure Application Insights.
 
+Make your Flask application able to send tracking information to an Application Insights Azure component.
+
 ## Dependencies
 
 - flask>=1.0.2
 - applicationinsights==0.11.6
+
+> If you are encountering locale issues with application insights, please check this hack: https://github.com/Azure/azure-cli-shell/issues/63
 
 ## Usage
 
@@ -15,7 +19,7 @@ Retrieve package from pypi:
 pip install flask_applicationinsights
 ```
 
-Instrumentation key can be provided programmatically as well as by environment variable or flask configuration key.
+> Instrumentation key can be provided programmatically as well as by environment variable or flask configuration key.
 Key name is `APPINSIGHTS_INSTRUMENTATION_KEY`.
 
 ### Basic
