@@ -18,6 +18,13 @@ class ConfigurationLoaderTestCase(unittest.TestCase):
 
         os.environ[CONFIG_KEY_INSTRUMENTATION_KEY] = ''
 
+    def test_init_from_ctor(self):
+        self.app.config[CONFIG_KEY_INSTRUMENTATION_KEY] = 'cfgkey'
+        insight = ApplicationInsights(self.app)
+
+        with self.app.app_context():
+            self.assertIsNotNone(insight.client)
+
     def test_instrumentation_key_from_config(self):
         self.app.config[CONFIG_KEY_INSTRUMENTATION_KEY] = 'cfgkey'
         insight = ApplicationInsights()
