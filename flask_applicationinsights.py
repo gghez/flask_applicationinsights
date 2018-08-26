@@ -4,7 +4,6 @@ import os
 import subprocess
 import threading
 import time
-import traceback
 
 from applicationinsights import TelemetryClient
 from applicationinsights.channel import TelemetryChannel, AsynchronousQueue, AsynchronousSender
@@ -26,17 +25,10 @@ def _extract_properties(req: Request, resp: Response):
                    req_body=req.data.decode('utf-8'),
                    req_form_data=json.dumps(req.form),
                    resp_status_code=resp.status_code,
-                   current_exc_trace=traceback.format_exc() if resp.status_code == 500 else None,
                    committish=committish,
                    worker_pid=os.getpid(),
                    worker_tid=threading.get_ident()
                    )
-    # Adds response content to log entry when any error occurs
-    if context['resp_status_code'] >= 400:
-        try:
-            context['resp_content'] = resp.get_data(as_text=True)
-        except Exception as e:
-            context['resp_content'] = str(e)
 
     return context
 
@@ -44,12 +36,12 @@ def _extract_properties(req: Request, resp: Response):
 class ApplicationInsights(object):
     def __init__(self, app: Flask = None, instrumentation_key: str = None):
         self.app = app
-        if app is not None:
-            self.init_app(app, instrumentation_key)
         self._properties_fillers = []
         self._measurements_fillers = []
         self._request_name = None
         self._instrumentation_key = instrumentation_key
+        if app is not None:
+            self.init_app(app, instrumentation_key)
 
     def init_app(self, app: Flask, instrumentation_key=None):
         instrumentation_key = instrumentation_key or self._instrumentation_key or os.environ.get(
