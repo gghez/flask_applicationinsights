@@ -5,11 +5,19 @@ Flask-ApplicationInsights
 Microsoft Azure Application Insights integration for Flask.
 """
 import subprocess
+import unittest
 
 from setuptools import setup
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
+
+
+def test_suite():
+    test_loader = unittest.TestLoader()
+    s = test_loader.discover('test', pattern='test_*.py')
+    return s
+
 
 setup(
     name='Flask-ApplicationInsights',
@@ -37,5 +45,6 @@ setup(
         'Programming Language :: Python :: 3',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules'
-    ]
+    ],
+    test_suite='setup.test_suite'
 )
