@@ -93,7 +93,7 @@ class ConfigurationLoaderTestCase(unittest.TestCase):
         r = c.get('/')
 
         self.assertEqual(b'HIT', r.data)
-        track_request_mock.assert_called_once()
+        self.assertEqual(1, track_request_mock.call_count)
         self.assertEqual('cfgreqname', track_request_mock.call_args[0][0])
 
 
@@ -114,7 +114,7 @@ class TrackingTestCase(unittest.TestCase):
         c = self.app.test_client()
         c.get('/')
 
-        track_request_mock.assert_called_once()
+        self.assertEqual(1, track_request_mock.call_count)
         self.assertEqual(('Flask', '/'), track_request_mock.call_args[0])
         self.assertTrue(track_request_mock.call_args[1]['success'])
         self.assertEqual(200, track_request_mock.call_args[1]['properties']['resp_status_code'])
@@ -132,7 +132,7 @@ class TrackingTestCase(unittest.TestCase):
         c = self.app.test_client()
         c.get('/error')
 
-        track_exception_mock.assert_called_once()
+        self.assertEqual(1, track_exception_mock.call_count)
         self.assertEqual(Exception, track_exception_mock.call_args[1]['type'])
         self.assertEqual('Fake exception', track_exception_mock.call_args[1]['value'].args[0])
 
