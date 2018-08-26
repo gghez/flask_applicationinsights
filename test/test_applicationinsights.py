@@ -119,6 +119,72 @@ class TrackingTestCase(unittest.TestCase):
         self.assertTrue(track_request_mock.call_args[1]['success'])
         self.assertEqual(200, track_request_mock.call_args[1]['properties']['resp_status_code'])
         self.assertEqual('GET', track_request_mock.call_args[1]['http_method'])
+        self.assertDictEqual({}, track_request_mock.call_args[1]['measurements'])
+
+    @patch('applicationinsights.TelemetryClient.track_request')
+    def test_request_tracking_request_name(self, track_request_mock: Mock):
+        @self.app.route('/')
+        def _index():
+            return 'HIT'
+
+        insight = ApplicationInsights()
+        insight.init_app(self.app)
+
+        @insight.request_name
+        def _request_name(req):
+            return 'AnotherRequestGroup'
+
+        c = self.app.test_client()
+        c.get('/')
+
+        self.assertEqual(1, track_request_mock.call_count)
+        self.assertEqual(('AnotherRequestGroup', '/'), track_request_mock.call_args[0])
+
+    @patch('applicationinsights.TelemetryClient.track_request')
+    def test_request_tracking_with_properties(self, track_request_mock: Mock):
+        @self.app.route('/')
+        def _index():
+            return 'HIT'
+
+        insight = ApplicationInsights()
+        insight.init_app(self.app)
+
+        @insight.properties
+        def _properties(req, resp):
+            return {
+                'prop1': 4,
+                'prop2': 'string'
+            }
+
+        c = self.app.test_client()
+        c.get('/')
+
+        self.assertEqual(1, track_request_mock.call_count)
+        self.assertEqual(4, track_request_mock.call_args[1]['properties']['prop1'])
+        self.assertEqual('string', track_request_mock.call_args[1]['properties']['prop2'])
+
+    @patch('applicationinsights.TelemetryClient.track_request')
+    def test_request_tracking_with_measurements(self, track_request_mock: Mock):
+        @self.app.route('/')
+        def _index():
+            return 'HIT'
+
+        insight = ApplicationInsights()
+        insight.init_app(self.app)
+
+        @insight.measurements
+        def _measurements(req, resp):
+            return {
+                'm1': 4.9,
+                'm2': 5.1
+            }
+
+        c = self.app.test_client()
+        c.get('/')
+
+        self.assertEqual(1, track_request_mock.call_count)
+        self.assertEqual(4.9, track_request_mock.call_args[1]['measurements']['m1'])
+        self.assertEqual(5.1, track_request_mock.call_args[1]['measurements']['m2'])
 
     @patch('applicationinsights.TelemetryClient.track_exception')
     def test_exception_tracking(self, track_exception_mock: Mock):
