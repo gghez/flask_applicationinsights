@@ -4,6 +4,8 @@ Flask extension for Microsoft Azure Application Insights.
 
 Make your Flask application able to send tracking information to an Application Insights Azure component.
 
+[![Build Status](https://travis-ci.org/gghez/flask_applicationinsights.svg?branch=master)](https://travis-ci.org/gghez/flask_applicationinsights)
+
 ## Dependencies
 
 - flask>=1.0.2
